@@ -1,0 +1,96 @@
+---
+title: 3 Body Problem (TV series)
+jupyter: python3
+---
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt
+from IPython.display import Image, display
+import matplotlib.ticker as ticker
+from IPython.display import Markdown
+```
+
+
+<b>Summary</b>
+
+<b>3 Body Problem</b> is an American science fiction television series created by *David Benioff, D. B. Weiss and Alexander Woo*, based on the Hugo Award–winning Chinese novel The Three-Body Problem by *Liu Cixin*. It is the second live-action adaptation after the 2023 Chinese television series.
+
+The series premiered on Netflix with eight episodes on March 21, 2024, and received mixed to positive reviews.
+
+<b>Premise</b>
+
+*Ye Wenjie*, an astrophysicist who sees her father beaten to death during a struggle session in the Chinese Cultural Revolution, is conscripted by the military. Due to her scientific background she is sent to a secret military base in a remote region. Her decision at the base to respond to contact from an alien planet implicates a group of scientists in the present day, forcing them to confront humanity's greatest threat.
+
+
+```{python}
+display(Image(filename='b.jpeg'))
+```
+
+<b>Critical response</b>
+
+The review aggregator <b>Rotten Tomatoes</b> reported a 80% approval rating with an average rating of 6.8/10, based on 104 critic reviews. The website's critics' consensus reads, "Tackling its ambitious source material with impressive gusto, 3 Body Problem's first season proves a solid start that should leave sci-fi fans eager for more." Metacritic assigned it a score of 70 out of 100, based on 40 critics, indicating "generally favorable reviews".
+
+```{python}
+df = pd.read_excel("stats.xlsx")
+df
+```
+
+### Top Netflix shows April views stats
+
+```{python}
+if df['Hours_viewed'].dtype == 'object': 
+    df['Hours_viewed'] = df['Hours_viewed'].str.replace(',', '').astype(int)
+if df['Views'].dtype == 'object':
+    df['Views'] = df['Views'].str.replace(',', '').astype(int)
+
+
+# Set up  area for the two subplots
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(14, 6))
+
+# Hours viewed 
+df.sort_values(by='Hours_viewed', ascending=False).plot(
+    x='Title', y='Hours_viewed', kind='bar', ax=axes[0], color='blue', legend=False
+)
+axes[0].set_title('Hours Viewed by TV Show')
+axes[0].set_ylabel('Hours Viewed')
+axes[0].set_xlabel('TV Show Titles')
+axes[0].tick_params(axis='x', rotation=45)
+
+# Format the y-axis to show numbers as millions without scientific notation
+axes[0].yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x/1e6) + 'M'))
+
+# Views
+df.sort_values(by='Views', ascending=False).plot(
+    x='Title', y='Views', kind='bar', ax=axes[1], color='green', legend=False
+)
+axes[1].set_title('Views by TV Show')
+axes[1].set_ylabel('Views')
+axes[1].set_xlabel('TV Show Titles')
+axes[1].tick_params(axis='x', rotation=45)
+
+# Format the y-axis to display numbers as millions without scientific notation
+axes[1].yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: '{:,.0f}'.format(x/1e6) + 'M'))
+
+plt.tight_layout()  
+plt.show() 
+```
+
+### Comparison of 3 Body Problem views to other Top Netflix series 
+
+```{python}
+reference_views = df[df['Title'] == '3 Body Problem']['Views'].iloc[0]
+df['Views_difference'] = reference_views - df['Views']
+
+
+# Markdown string with dynamic content
+markdown_str = "\n".join([
+    f"- {row['Title']} has {row['Views_difference']:,} fewer views than 3 Body Problem."
+    for index, row in df.iterrows() if row['Title'] != '3 Body Problem'
+])
+
+# Display the markdown string as it would be in markdown cell
+display(Markdown(markdown_str))
+```
+
+
